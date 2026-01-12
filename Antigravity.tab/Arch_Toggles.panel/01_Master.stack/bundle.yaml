@@ -1,0 +1,4 @@
+layout:
+  - Snapshots.pulldown
+  - Search.pushbutton
+  - ResetAll.pushbutton

@@ -5,6 +5,7 @@
 
 import os, sys, inspect, random
 import io
+import shutil
 # import clr
 
 
@@ -115,7 +116,13 @@ print("⚡  LIGHTNING FACTORY v4: INITIALIZING...  ⚡")
 
 panel_root = os.path.join(EXTENSION_PATH, TAB_NAME, PANEL_NAME)
 
-# --- 1. CLEANUP (Optional: manually delete old buttons if needed, but we'll overwrite) ---
+# --- 1. CLEANUP (Nuke old panel to ensure no ghost buttons) ---
+if os.path.exists(panel_root):
+    try:
+        shutil.rmtree(panel_root)
+        print("   [Clean] Removed old panel files.")
+    except Exception as e:
+        print("   [Warning] Could not clean panel folder: " + str(e))
 
 # --- 2. STACK: MASTER CONTROLS ---
 stack_master = os.path.join(panel_root, "01_Master.stack")
