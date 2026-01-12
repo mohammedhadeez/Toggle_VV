@@ -15,12 +15,27 @@ from constants import MASTER_CATEGORY_LIST, ANNOTATION_CATEGORY_LIST
 # VISIBILITY CORE
 # ==============================================================================
 
+# Bolt Optimization: Category Cache (O(1) Lookup)
+_CATEGORY_CACHE = {}
+
 def get_category_id(doc, name):
-    """Helper to find category ID by name."""
-    # This is a simplified lookup. In a real plugin, you might cache this map.
+    """Helper to find category ID by name (Cached)."""
+    global _CATEGORY_CACHE
+
+    # 1. Fast Path: Cache Hit
+    if name in _CATEGORY_CACHE:
+        return _CATEGORY_CACHE[name]
+
+    # 2. Slow Path: Linear Search
+    # Note: iterating doc.Settings.Categories is O(n)
     for cat in doc.Settings.Categories:
+        # Cache every category we see to warm up the cache faster
+        # (Assuming unique names which is generally true for top-level)
+        _CATEGORY_CACHE[cat.Name] = cat.Id
+
         if cat.Name == name:
             return cat.Id
+
     return None
 
 def toggle_category(cat_name):
@@ -67,10 +82,10 @@ def set_all_visibility(visible, category_list=MASTER_CATEGORY_LIST):
 # ==============================================================================
 
 def cmd_unhide_all_arch():
-    set_all_visibility(True, MASTER_CATEGORY_LIST) # True means "Visible" (Not Hidden) -> Wait, SetCategoryHidden(True) means Hidden.
-    # Logic: SetCategoryHidden(True) -> Hidden. SetCategoryHidden(False) -> Visible.
-    # So "Unhide All" means set_all(False).
-    # Let's fix the parameter name in set_all_visibility to be 'should_hide'.
+    # Fix: True means "should be visible" -> hidden=False
+    # The set_all_visibility function takes (visible) bool.
+    # If visible=True, we set hidden=False.
+    set_all_visibility(True, MASTER_CATEGORY_LIST)
 
 def cmd_hide_all_ann():
     _set_list_hidden(True, ANNOTATION_CATEGORY_LIST)
