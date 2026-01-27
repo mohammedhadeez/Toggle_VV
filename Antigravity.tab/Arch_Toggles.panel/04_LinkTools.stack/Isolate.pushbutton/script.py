@@ -1,0 +1,2 @@
+from vis_manager import cmd_isolate_selected_category
+cmd_isolate_selected_category()
